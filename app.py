@@ -52,20 +52,12 @@ if st.session_state[const.API_KEY]:
         paint_message(input_topic, const.USER)
         assistants.research_topic(input_topic)
         while True:
-            # if assistants._run.required_action.type == "submit_tool_outputs":
-            #     assistants.submit_tool_outputs()
-            # else:
-            #     assistants.runs_poll()
-                
-            # if assistants._run.status == "complete":
-            #     paint_message(assistants.get_messages(), const.AI)
-            #     break
             match assistants._run.status:
-                case "requires_action":
-                    assistants.submit_tool_outputs()
                 case "complete":
                     paint_message(assistants.get_messages(), "ai")
                     break
+                case "requires_action":
+                    assistants.submit_tool_outputs()
                 case "expired" | "cancelled" | "failed":
                     st.error("AI failed to complete the request.")
                     break

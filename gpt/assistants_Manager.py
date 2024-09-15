@@ -62,17 +62,11 @@ class AssistantManager:
     
     def _get_tool_outputs(self):
         outputs = []
-        expected_call_ids = [action.id for action in self._run.required_action.submit_tool_outputs.tool_calls]
-
+        
         for action in self._run.required_action.submit_tool_outputs.tool_calls:
             action_id = action.id
             function = action.function
             action_input = json.loads(function.arguments)
-
-            if action_id not in expected_call_ids:
-                print(f"API에서 요청하지 않은 call_id: {action_id}. 해당 출력은 무시됩니다.")
-                continue
-
             if function.name in FUNCTIONS_MAP:
                 output = FUNCTIONS_MAP[function.name]
                 outputs.append(
