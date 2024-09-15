@@ -32,7 +32,7 @@ with st.sidebar:
         if api_key:
             with st.spinner("Checking API Key..."):
                 if is_valid_openai_key(api_key):
-                    st.session_state.api_key = api_key
+                    st.session_state[const.API_KEY] = api_key
                 else:
                     st.warning("API key is not valid. Try again.")
                     
@@ -51,24 +51,24 @@ if st.session_state[const.API_KEY]:
     if input_topic := st.text_input("Ask about any topic!", placeholder="What is the XL Backdoor?"):
         paint_message(input_topic, const.USER)
         assistants.research_topic(input_topic)
-        while assistants._run.status != 'completed':
-            if assistants._run.required_action.type == "submit_tool_outputs":
-                assistants.submit_tool_outputs()
-            else:
-                assistants.runs_poll()
+        while True:
+            # if assistants._run.required_action.type == "submit_tool_outputs":
+            #     assistants.submit_tool_outputs()
+            # else:
+            #     assistants.runs_poll()
                 
-            if assistants._run.status == "complete":
-                paint_message(assistants.get_messages(), const.AI)
-                break
-            # match assistants._run.status:
-            #     case "requires_action":
-            #         assistants.submit_tool_outputs()
-            #     case "complete":
-            #         paint_message(assistants.get_messages(), "ai")
-            #         break
-            #     case "expired" | "cancelled" | "failed":
-            #         st.error("AI failed to complete the request.")
-            #         break
-            #     case _:
-            #         pass
-            # time.sleep(0.5)
+            # if assistants._run.status == "complete":
+            #     paint_message(assistants.get_messages(), const.AI)
+            #     break
+            match assistants._run.status:
+                case "requires_action":
+                    assistants.submit_tool_outputs()
+                case "complete":
+                    paint_message(assistants.get_messages(), "ai")
+                    break
+                case "expired" | "cancelled" | "failed":
+                    st.error("AI failed to complete the request.")
+                    break
+                case _:
+                    pass
+            time.sleep(0.5)
