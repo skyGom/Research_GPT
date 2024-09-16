@@ -35,6 +35,8 @@ with st.sidebar:
                     st.session_state[const.API_KEY] = api_key
                 else:
                     st.warning("API key is not valid. Try again.")
+    
+    st.link_button("Git repository", "https://github.com/skyGom/Research_GPT")
                     
 if st.session_state[const.API_KEY]:
     if const.ASSISTANTS not in st.session_state:
