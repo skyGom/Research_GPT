@@ -12,5 +12,7 @@ def duckduckgo_search_tool(input):
     return ddg.run(input)
 
 def website_scraping_tool(input):
-    loader = WebBaseLoader(input)
-    return loader.load()
+    url = input["url"]
+    loader = WebBaseLoader(url)
+    data = loader.load()
+    return data[0].page_content

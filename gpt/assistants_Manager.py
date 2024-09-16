@@ -45,6 +45,9 @@ class AssistantManager:
             thread_id=self._thread.id,
             assistant_id=self._assistants.id,
         )
+        
+    def get_run(self):
+        return self._client.beta.threads.runs.retrieve(thread_id=self._thread.id, run_id=self._run.id)
     
     def research_topic(self, content):
         self._thread = self._create_thread(content)
@@ -62,17 +65,15 @@ class AssistantManager:
     
     def _get_tool_outputs(self):
         outputs = []
-        
+        self._run = self.get_run()
         for action in self._run.required_action.submit_tool_outputs.tool_calls:
             action_id = action.id
             function = action.function
-            action_input = json.loads(function.arguments)
             if function.name in FUNCTIONS_MAP:
-                output = FUNCTIONS_MAP[function.name]
                 outputs.append(
                     {
                         "tool_call_id": action_id,
-                        "output": output(action_input),
+                        "output": FUNCTIONS_MAP[function.name](json.loads(function.arguments))
                     }
                 )
             else:

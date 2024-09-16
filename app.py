@@ -44,7 +44,7 @@ if st.session_state[const.API_KEY]:
         assistants = st.session_state[const.ASSISTANTS]
     
     if len(st.session_state[const.MESSAGES]) <= 0:
-        paint_message("Assistant is ready!", const.AI, False)
+        paint_message("Assistant is ready!", const.AI, is_save=False)
     else:
         paint_message_history()
     
@@ -52,15 +52,15 @@ if st.session_state[const.API_KEY]:
         paint_message(input_topic, const.USER)
         assistants.research_topic(input_topic)
         while True:
-            match assistants._run.status:
-                case "complete":
-                    paint_message(assistants.get_messages(), "ai")
+            match assistants.get_run().status:
+                case "completed":
+                    paint_message(assistants.get_messages(), const.AI, is_downloadable=True)
                     break
                 case "requires_action":
                     assistants.submit_tool_outputs()
-                case "expired" | "cancelled" | "failed":
-                    st.error("AI failed to complete the request.")
+                case "expired" | "cancelled" | "failed" | "incomplete":
+                    print("AI failed to complete the request.")
                     break
-                case _:
+                case "queued":
                     pass
-            time.sleep(0.5)
+                    time.sleep(0.5)
